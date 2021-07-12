@@ -1,53 +1,75 @@
-import  math
+import sys
+
+sys.setrecursionlimit(150000)
+
+
+
+class Node:
+    def __init__(self,coord =None,direction = None,parent =None):
+        self.coord  = None
+        self.direction =  None
+        self.parent =  None
+    def __str__(self) -> str:
+        return f"(self.coord) and (self.direction)"    
+
 def direction(x):
-    return [[x[0],x[1]+1,"R",[]],[x[0],x[1]-1,"L",[]],[x[0]+1,x[1],"D",[]],[x[0]-1,x[1],"U",[]]]
+    m = Node()
+    m.coord=(x[0],x[1]+1)
+    m.direction="R"
+    y = Node()
+    y.coord=(x[0],x[1]-1)
+    y.direction="L"
+    z = Node()
+    z.coord=(x[0]+1,x[1])
+    z.direction="D"
+    w = Node()
+    w.coord=(x[0]-1,x[1])
+    w.direction="U"
+    return [m,y,z,w]
 
 
 
-def bfs(map,A):
-    best  = math.inf
-    res = None
-    curRes = []
-    q = []
-    q.append(A)
-    map[A[0]][A[1]] = 1
-    while q:
-        
-        x = q.pop()
-        
-        x[3].append(x[2])
-        
-        for i in direction(x):
-            if map[i[0]][i[1]] == "B":
-                x[3].append(i[2])
-                if len(x[3]) < best:
-                    res = x[3]
-                break
-            if map[i[0]][i[1]] == ".":
-                map[i[0]][i[1]] = "1"
-                i[3] = x[3][0:]
-                q.append(i)
+def dfsRec(A,visited,Map,res):
+    visited.append(A.coord)
+    
+    for i in direction(A.coord):
+        if Map[i.coord[0]][i.coord[1]] == "B":
+            i.parent = A
+            res.append(i)
+            return
 
-    return res
+        if Map[i.coord[0]][i.coord[1]] == "." and i.coord not in visited:
+            i.parent = A
+            dfsRec(i,visited,Map,res)
 
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     n , m = map(int,input().split())
-    map = []
-    A = 0
+    Map = []
+    A = Node()
+    Map.append(["#"]*(m+2))
     for i in range(n):
-        l = list(input())
-        for j in range(m):
-            if l[j] == "A":
-                A = (i,j,"S",[])
-        map.append(l)
-    res = bfs(map,A)
-    if   res != None:
-        print("YES")
-        print(len(res)-1)
-        print("".join(res[1:]))    
-    else:
+        l = ["#"] + list(input()) + ["#"]
+        if not A.coord :
+            for j in range(m+1):
+                if l[j] == "A":
+                    A.coord = (i+1,j) 
+        Map.append(l)
+    Map.append(["#"]*(m+2))
+    visited = []
+    res = []
+    dfsRec(A,visited,Map,res)
+
+    if len(res) == 0:
         print("NO")
-        
-
-
+    else:
+        print("YES")
+        s = []
+        x = res[0]
+        while  x != None  and x.direction != None:
+            s.append(x.direction)
+            x = x.parent
+        l = "".join(s)
+        print(len(l))            
+        print(l[::-1])    
