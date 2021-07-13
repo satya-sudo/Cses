@@ -1,75 +1,95 @@
-import sys
+"""
+    we are going to use bfs with rhombus radiation 
+    the trick is we ll mark parent for each value 
+"""
+# node  -> pos
+#       -> parent
 
-sys.setrecursionlimit(150000)
 
-
-
-class Node:
-    def __init__(self,coord =None,direction = None,parent =None):
-        self.coord  = None
-        self.direction =  None
-        self.parent =  None
-    def __str__(self) -> str:
-        return f"(self.coord) and (self.direction)"    
-
-def direction(x):
-    m = Node()
-    m.coord=(x[0],x[1]+1)
-    m.direction="R"
-    y = Node()
-    y.coord=(x[0],x[1]-1)
-    y.direction="L"
-    z = Node()
-    z.coord=(x[0]+1,x[1])
-    z.direction="D"
-    w = Node()
-    w.coord=(x[0]-1,x[1])
-    w.direction="U"
-    return [m,y,z,w]
+from collections import deque 
+drection = [(0,1),(0,-1),(1,0),(-1,0)]
 
 
 
-def dfsRec(A,visited,Map,res):
-    visited.append(A.coord)
+def direction(b,x):
+    for i in range(4):
+        if (x[0]+drection[i][0],x[1]+drection[i][1]) == b:
+            if i == 0:
+                return "R"
+            if i == 1:
+                return "L"
+            if i == 2:
+                return "D"
+            else:
+                return "U"          
+
+
+
+def isvalid(s):
+    if 0 <= s[0]<n and 0<=s[1]<m and grid[s[0]][s[1]] != "#" and visited[s[0]][s[1]] == False:
+        return True
+    return False    
+
+
+
+def bfs(s):
+    q = deque()
+    q.append(s)
+    visited[s[0]][s[1]] = 1
+    while q:
+        x = q.popleft()
+        for a,b in drection:
+            if isvalid((x[0]+a,x[1]+b)):
+                q.append((x[0]+a,x[1]+b))
+                visited[x[0]+a][x[1]+b] = 1
+                path[x[0]+a][x[1]+b] = x
+                if grid[x[0]+a][x[1]+b]  == "B":
+                    return (x[0]+a,x[1]+b)   
+    return None
+
     
-    for i in direction(A.coord):
-        if Map[i.coord[0]][i.coord[1]] == "B":
-            i.parent = A
-            res.append(i)
-            return
+# input 
 
-        if Map[i.coord[0]][i.coord[1]] == "." and i.coord not in visited:
-            i.parent = A
-            dfsRec(i,visited,Map,res)
+n,m = map(int,input().split())
+grid = []
+start =  None
+visited =[]
+for i in range(n):
+    l = []
+    for j in range(m):
+        l.append(0)
+    visited.append(l)    
+path = [[None for i in range(m)] for j in range(n)]
 
-
-
-if __name__ == "__main__":
-    n , m = map(int,input().split())
-    Map = []
-    A = Node()
-    Map.append(["#"]*(m+2))
-    for i in range(n):
-        l = ["#"] + list(input()) + ["#"]
-        if not A.coord :
-            for j in range(m+1):
-                if l[j] == "A":
-                    A.coord = (i+1,j) 
-        Map.append(l)
-    Map.append(["#"]*(m+2))
-    visited = []
+for i in range(n):
+    l = list(input())
+    grid.append(l)
+    if start == None:
+        for j in range(m):
+            if l[j] == 'A':
+                start = (i,j)
+    
+    
+b = bfs(start)
+if b:
     res = []
-    dfsRec(A,visited,Map,res)
+    c = 0
+    while b  != start:
+        x = b
+        b = path[b[0]][b[1]]
+        res.append(direction(x,b))
+        c += 1
+    print("YES")
+    print(c)
+    print("".join(res)[::-1])    
+else:
+    print("NO")    
 
-    if len(res) == 0:
-        print("NO")
-    else:
-        print("YES")
-        s = []
-        x = res[0]
-        while  x != None  and x.direction != None:
-            s.append(x.direction)
-            x = x.parent
-        l = "".join(s)
-        print(len(l))            
-        print(l[::-1])    
+
+
+
+
+
+
+
+
