@@ -20,6 +20,8 @@ if __name__ == "__main__":
     for i in range(n):
         for j in range(m):
             if gird[i][j] == '.': 
+
+                # making the visited points
                 gird[i][j] = '#'
                 dfs(gird,i,j)
                 count += 1
